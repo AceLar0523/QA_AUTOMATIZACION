@@ -1,0 +1,50 @@
+{"id": "TC-001", "module": "Autenticación", "title": "Iniciar sesión con correo y contraseña"}
+{"id": "TC-002", "module": "Autenticación", "title": "Iniciar sesión con Google (SSO)"}
+{"id": "TC-003", "module": "Autenticación", "title": "Solicitar restablecimiento de contraseña"}
+{"id": "TC-004", "module": "Autenticación", "title": "Confirmar nueva contraseña desde enlace"}
+{"id": "TC-005", "module": "Perfil", "title": "Actualizar foto y teléfono de perfil de usuario"}
+{"id": "TC-006", "module": "Usuarios y Roles", "title": "Crear un nuevo rol"}
+{"id": "TC-007", "module": "Usuarios y Roles", "title": "Modificar permisos de un rol (Matriz de Accesos)"}
+{"id": "TC-008", "module": "Usuarios y Roles", "title": "Crear un nuevo usuario del sistema"}
+{"id": "TC-009", "module": "Usuarios y Roles", "title": "Dar de baja lógica a un usuario"}
+{"id": "TC-010", "module": "Usuarios y Roles", "title": "Autorizar a un usuario en Google Whitelist"}
+{"id": "TC-011", "module": "Catálogo", "title": "Crear nueva categoría de productos"}
+{"id": "TC-012", "module": "Catálogo", "title": "Registrar nueva sucursal"}
+{"id": "TC-013", "module": "Catálogo", "title": "Registrar nuevo producto"}
+{"id": "TC-014", "module": "Inventario", "title": "Asignar producto al inventario de una sucursal"}
+{"id": "TC-015", "module": "Inventario", "title": "Ajustar stock de producto desde panel de Empleado (Mi Inventario)"}
+{"id": "TC-016", "module": "Punto de Caja", "title": "Registrar nuevo cliente en el sistema"}
+{"id": "TC-017", "module": "Punto de Caja", "title": "Realizar venta e imprimir factura en punto de caja"}
+{"id": "TC-018", "module": "Operaciones", "title": "Consultar historial de ventas y detalles de venta"}
+{"id": "TC-019", "module": "Operaciones", "title": "Consultar historial de variaciones de stock"}
+{"id": "TC-020", "module": "Finanzas", "title": "Consultar transacciones financieras registradas"}
+{"id": "TC-021", "module": "Finanzas", "title": "Consultar balances mensuales de las sucursales"}
+{"id": "TC-022", "module": "Tareas", "title": "Crear estado y prioridad de tarea"}
+{"id": "TC-023", "module": "Tareas", "title": "Crear y asignar tarea a un empleado (Gerencia)"}
+{"id": "TC-024", "module": "Tareas", "title": "Actualizar progreso y estado de una tarea asignada (Empleado)"}
+{"id": "TC-025", "module": "Auditoría", "title": "Consultar el registro de actividad de los usuarios"}
+{"id": "TC-026", "module": "Auditoría", "title": "Consultar el registro de logs de errores del sistema"}
+{"id": "TC-027", "module": "Auditoría", "title": "Ver métricas de rendimiento y monitoreo del servidor"}
+{"id": "TC-028", "module": "Respaldos", "title": "Configurar la frecuencia de respaldos automáticos de base de datos"}
+{"id": "TC-029", "module": "Respaldos", "title": "Solicitar y autorizar (Gerencia) un respaldo manual"}
+{"id": "TC-030", "module": "Agente IA", "title": "Consultar al agente conversacional sobre datos de inventario"}
+{"id": "TC-031", "module": "Agente IA", "title": "Solicitar análisis comparativo de sucursales a la IA"}
+{"id": "TC-032", "module": "Agente IA", "title": "Exportar reporte generado por agente IA a PDF o Excel"}
+{"id": "TC-033", "module": "OCR", "title": "Procesar y extraer datos de documentos mediante escaneo OCR"}
+
+------------------------------------------------------------
+MAPEO DE MÓDULOS A TEXTO DE NAVEGACIÓN (PYTHON)
+------------------------------------------------------------
+nav_text_match = None
+if "autenticación" in module_lower or "perfil" in module_lower: nav_text_match = "Mi Perfil"
+elif "usuarios" in module_lower or "roles" in module_lower: nav_text_match = "Usuarios y Roles"
+elif "catálogo" in module_lower or "catalogo" in module_lower: nav_text_match = "Catálogo"
+elif "inventario" in module_lower: nav_text_match = "Inventario"
+elif "punto de caja" in module_lower or "caja" in module_lower: nav_text_match = "Punto de Caja"
+elif "operaciones" in module_lower or "ventas" in module_lower: nav_text_match = "Operaciones"
+elif "finanzas" in module_lower or "balances" in module_lower: nav_text_match = "Finanzas"
+elif "tareas" in module_lower: nav_text_match = "Gestión de Tareas"
+elif "auditoría" in module_lower or "auditoria" in module_lower: nav_text_match = "Auditoría del Sistema"
+elif "respaldos" in module_lower or "backups" in module_lower: nav_text_match = "Respaldos"
+elif "agente ia" in module_lower or "asistente" in module_lower: nav_text_match = "Asistente Gerencial IA"
+elif "ocr" in module_lower: nav_text_match = "Escaneo OCR"
