@@ -134,6 +134,36 @@ async def execute_test_with_playwright(test_data):
     os.makedirs("Screenshots", exist_ok=True)
     screenshot_filename = f"evidencia_{test_data['test_id']}.png"
     screenshot_path = os.path.abspath(os.path.join("Screenshots", screenshot_filename))
+
+    async def wait_until_not_loading(page_ref):
+        try:
+            loader = page_ref.locator(".state-box", has_text=re.compile(r"cargando", re.IGNORECASE)).first
+            if await loader.is_visible(timeout=1000):
+                await loader.wait_for(state="hidden", timeout=10000)
+        except Exception:
+            pass
+
+    async def expand_sidebar_if_needed(page_ref):
+        # Regla de la guía: intentar hover sobre contenedor y luego click en toggle si existe.
+        try:
+            sidebar_container = page_ref.locator("aside, .sidebar, .app-sidebar, .sidebar-container, nav").first
+            if await sidebar_container.is_visible(timeout=1000):
+                await sidebar_container.hover()
+                await page_ref.wait_for_timeout(400)
+        except Exception:
+            pass
+
+        try:
+            menu_toggle = page_ref.locator(
+                "button.sidebar-toggle, .hamburger, #sidebarCollapse, [title*='Expandir'], "
+                "button[aria-label*='menu'], button[aria-label*='sidebar'], .toggle-sidebar, .menu-toggle"
+            ).first
+            if await menu_toggle.is_visible(timeout=1000):
+                print("Detectado botón de menú lateral, haciendo clic para desplegar...")
+                await menu_toggle.click(force=True)
+                await page_ref.wait_for_timeout(600)
+        except Exception:
+            pass
     
     try:
         async with async_playwright() as p:
@@ -168,25 +198,24 @@ async def execute_test_with_playwright(test_data):
                     
                     print("Auto-login: Esperando 5 segundos a que cargue el dashboard o 2FA...")
                     await page.wait_for_timeout(3000)
+                    await wait_until_not_loading(page)
                     
-                    # Manejar 2FA si aparece
+                    # Manejar 2FA si aparece (Opcional, no bloqueante)
                     try:
                         input_2fa = page.locator("input[name='codigo2FA'], input[placeholder*='XX-XX']").first
-                        await input_2fa.wait_for(state="visible", timeout=6000)
-                        
-                        print("Auto-login: Detectada verificación 2FA. Ingresando código maestro 000000...")
-                        await input_2fa.fill("000000")
-                        
-                        # Clic en el botón "Verificar y Entrar"
-                        btn_verificar = page.locator("button").filter(has_text=re.compile(r"verificar", re.IGNORECASE)).first
-                        if await btn_verificar.is_visible():
-                            await btn_verificar.click()
-                        else:
-                            await page.keyboard.press("Enter")
+                        if await input_2fa.is_visible(timeout=3000):
+                            print("Auto-login: Detectada verificación 2FA. Ingresando código maestro 000000...")
+                            await input_2fa.fill("000000")
                             
-                        await page.wait_for_timeout(4000) # Esperar a que cargue el dashboard interno
-                    except Exception as e2fa:
-                        print("No se detectó 2FA o error al llenarlo:", e2fa)
+                            btn_verificar = page.locator("button").filter(has_text=re.compile(r"verificar", re.IGNORECASE)).first
+                            if await btn_verificar.is_visible():
+                                await btn_verificar.click()
+                            else:
+                                await page.keyboard.press("Enter")
+                                
+                            await page.wait_for_timeout(4000)
+                    except Exception:
+                        print("Bypass 2FA: No se requirió o se omitió.")
                         
                 except Exception as e:
                     print("Auto-login omitido o fallido:", e)
@@ -194,68 +223,99 @@ async def execute_test_with_playwright(test_data):
                     await page.goto("http://localhost:5173/", timeout=5000)
                     await page.wait_for_timeout(2000)
 
-                # === NAVEGACIÓN DINÁMICA SEGÚN MÓDULO ===
+                # === NAVEGACIÓN DINÁMICA SEGÚN MÓDULO (MEJORADA POR ESTRUCTURAVISUAL.TXT) ===
                 try:
                     module_lower = test_data.get('module', '').lower()
                     title_lower = test_data.get('title', '').lower()
-                    
+
+                    await expand_sidebar_if_needed(page)
+
                     if "cerrar" in title_lower or "logout" in title_lower:
                         print("Simulando clic en Cerrar Sesión...")
-                        btn_logout = page.locator("button.btn-logout, button[title='Cerrar Sesión']").first
+                        btn_logout = page.locator("button.btn-logout, button[title='Cerrar Sesión'], a").filter(has_text=re.compile(r"cerrar sesión|logout", re.IGNORECASE)).first
                         if await btn_logout.is_visible(timeout=3000):
                             await btn_logout.click()
                             await page.wait_for_timeout(2000)
                     else:
-                        nav_text_match = None
-                        if "autenticación" in module_lower or "perfil" in module_lower: nav_text_match = "Mi Perfil"
-                        elif "usuarios" in module_lower or "roles" in module_lower: nav_text_match = "Usuarios y Roles"
-                        elif "catálogo" in module_lower or "catalogo" in module_lower: nav_text_match = "Catálogo"
-                        elif "inventario" in module_lower: nav_text_match = "Inventario"
-                        elif "punto de caja" in module_lower or "caja" in module_lower: nav_text_match = "Punto de Caja"
-                        elif "operaciones" in module_lower or "ventas" in module_lower: nav_text_match = "Operaciones"
-                        elif "finanzas" in module_lower or "balances" in module_lower: nav_text_match = "Finanzas"
-                        elif "tareas" in module_lower: nav_text_match = "Gestión de Tareas"
-                        elif "auditoría" in module_lower or "auditoria" in module_lower: nav_text_match = "Auditoría del Sistema"
-                        elif "respaldos" in module_lower or "backups" in module_lower: nav_text_match = "Respaldos"
-                        elif "agente ia" in module_lower or "asistente" in module_lower: nav_text_match = "Asistente Gerencial IA"
-                        elif "ocr" in module_lower: nav_text_match = "Escaneo OCR"
-                                                
-                        navigated = False
-                        if nav_text_match:
-                            print(f"Buscando módulo en sidebar: {nav_text_match}")
-                            await page.wait_for_timeout(1000)
-                            nav_item = page.locator("a.nav-item").filter(has_text=re.compile(nav_text_match, re.IGNORECASE)).first
-                            if await nav_item.is_visible(timeout=3000):
-                                await nav_item.click()
-                                await page.wait_for_timeout(3000)
-                                navigated = True
-                                print(f"✅ [ASSERT] Navegación exitosa al módulo '{nav_text_match}'")
-                            else:
-                                print(f"❌ [ASSERT FALLIDO] No se encontró '{nav_text_match}' en el sidebar.")
+                        module_default_route = {
+                            "autenticación": "/app/dashboard",
+                            "perfil": "/app/perfil",
+                            "catálogo": "/app/categorias",
+                            "catalogo": "/app/categorias",
+                            "inventario": "/app/inventario",
+                            "inventario global": "/app/inventario",
+                            "operaciones": "/app/ventas",
+                            "punto de caja": "/app/punto-caja",
+                            "mis tareas": "/app/mis-tareas",
+                            "mi inventario": "/app/mi-inventario",
+                            "ocr": "/app/ocr/escaneo-documentos",
+                            "documentación": "/app/ocr/documentaciones",
+                            "finanzas": "/app/transacciones-financieras",
+                            "tareas": "/app/tareas",
+                            "usuarios y roles": "/app/usuarios",
+                            "respaldos": "/app/respaldos",
+                            "auditoría": "/app/auditoria/registro-actividad",
+                            "auditoria": "/app/auditoria/registro-actividad",
+                            "agente ia": "/app/dashboard",
+                        }
 
-                        # Intentar hacer clics dinámicos si el título sugiere Crear o Asignar
-                        if "crear" in title_lower or "nuevo" in title_lower or "registrar" in title_lower or "agregar" in title_lower:
-                            btn_crear = page.locator("main.main-content button, main.main-content a").filter(has_text=re.compile(r"crear|nuevo|registrar|agregar", re.IGNORECASE)).first
+                        target_route = module_default_route.get(module_lower)
+                        if not target_route:
+                            if "mi inventario" in title_lower:
+                                target_route = "/app/mi-inventario"
+                            elif "mis tareas" in title_lower:
+                                target_route = "/app/mis-tareas"
+                            elif "sucursal" in title_lower and "inventario" in title_lower:
+                                target_route = "/app/inventario"
+
+                        if not target_route:
+                            print(f"❌ [BLOQUEO] El módulo '{module_lower}' no está definido en el protocolo Jawitas. Abortando prueba.")
+                            raise Exception(f"Módulo '{module_lower}' no reconocido en la estructura estructuravisual.txt")
+
+                        print(f"Buscando navegación por href exacto: {target_route}")
+
+                        navigated = False
+                        exact_link = page.locator(f"a[href='{target_route}'], [href='{target_route}']").first
+                        if await exact_link.is_visible(timeout=2000):
+                            await exact_link.click()
+                            await page.wait_for_timeout(1200)
+                            await wait_until_not_loading(page)
+                            navigated = target_route in page.url
+                            if navigated:
+                                print(f"✅ [ASSERT] Navegación por href exitosa a {target_route}")
+                        
+                        # 3. FALLBACK: Si no pudo clickear o no encontró el sub-módulo, ir a la ruta directa
+                        if not navigated:
+                            print(f"⚠️ Navegación visual falló o sub-módulo no detectado. Usando Fallback de Ruta Directa...")
+                            fallback_route = target_route
+                            if fallback_route:
+                                print(f"Redirigiendo a: {fallback_route}")
+                                await page.goto(f"http://localhost:5173{fallback_route}", timeout=5000)
+                                await page.wait_for_timeout(2000)
+                                await wait_until_not_loading(page)
+                                if fallback_route in page.url:
+                                    navigated = True
+
+                        if not navigated:
+                            raise Exception(f"No se pudo navegar al módulo '{test_data.get('module')}' desde sidebar ni por fallback")
+
+                        # Acciones dinámicas (Botones de Nuevo, Crear, etc)
+                        if any(x in title_lower for x in ["crear", "nuevo", "registrar", "agregar"]):
+                            btn_crear = page.locator("main button, main a, .btn-primary, .btn-success").filter(has_text=re.compile(r"crear|nuevo|registrar|agregar", re.IGNORECASE)).first
                             if await btn_crear.is_visible(timeout=2000):
-                                print("Simulando clic en botón de Crear...")
                                 await btn_crear.click()
                                 await page.wait_for_timeout(2000)
-                                print("✅ [ASSERT] Interacción con botón de Creación exitosa")
-                        elif "asignar" in title_lower:
-                            btn_asignar = page.locator("main.main-content button, main.main-content a").filter(has_text=re.compile(r"asignar|seleccionar", re.IGNORECASE)).first
-                            if await btn_asignar.is_visible(timeout=2000):
-                                print("Simulando clic en botón de Asignar...")
-                                await btn_asignar.click()
-                                await page.wait_for_timeout(2000)
-                                print("✅ [ASSERT] Interacción con botón de Asignación exitosa")
+                                print("✅ [ASSERT] Interacción con botón de acción exitosa")
                 except Exception as e_nav:
                     print("Error en navegación dinámica:", e_nav)
                     print("❌ [ASSERT EXCEPCIÓN] Error inesperado en UI")
+                    raise
 
                 await page.screenshot(path=screenshot_path)
             except Exception as e:
                 print(f"Aviso: Servidor local no levantado o falló: {e}")
                 screenshot_path = None
+                raise
                 
             for step in test_data['steps']:
                 await asyncio.sleep(0.5)
@@ -276,6 +336,7 @@ async def execute_test_with_playwright(test_data):
             step['status'] = "FALLA"
             step['defects'] = str(e)
             step['screenshot_path'] = None
+        raise Exception(f"Ejecución Playwright fallida: {e}") from e
             
     return test_data
 

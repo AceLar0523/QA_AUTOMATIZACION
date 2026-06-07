@@ -134,22 +134,88 @@
             margin: 0;
         }
 
+        .reports-shell {
+            margin-top: 0.5rem;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .report-column {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 0.9rem;
+            min-height: 280px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            animation: fadeUp 0.45s ease both;
+        }
+
+        .report-column:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .report-column-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #d4dbe6;
+        }
+
+        .report-column-title {
+            margin: 0;
+            font-size: 0.95rem;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: #334155;
+        }
+
+        .report-count {
+            font-size: 0.75rem;
+            background: #e2e8f0;
+            color: #334155;
+            border-radius: 999px;
+            padding: 0.25rem 0.55rem;
+            font-weight: 700;
+        }
+
+        .report-column.functional {
+            border-top: 4px solid #10b981;
+        }
+
+        .report-column.non-functional {
+            border-top: 4px solid #3b82f6;
+        }
+
         .report-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-light);
+            padding: 0.9rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #ffffff;
+            margin-bottom: 0.65rem;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
 
-        .report-item:last-child {
-            border-bottom: none;
+        .report-item:hover {
+            transform: translateY(-2px);
+            border-color: #cbd5e1;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
         }
 
         .report-item a {
             color: var(--text-dark);
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
 
         .report-item a:hover {
@@ -171,6 +237,7 @@
             font-size: 0.85rem;
             background-color: var(--text-dark);
             margin-top: 0;
+            border-radius: 8px;
         }
         .btn-small:hover {
             background-color: #1a1c26;
@@ -280,13 +347,39 @@
             margin-top: 0;
             padding-bottom: 10px;
         }
+
+        .report-empty {
+            padding: 0.8rem;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            color: #64748b;
+            font-size: 0.86rem;
+            background: #f8fafc;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 980px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <header>
-    <h1>QA Dashboard <span>Logística Automática</span></h1>
+    <h1>QA Dashboard <span>Jawitas - Mi Chulumani</span></h1>
 </header>
 
 <!-- Modal Inmersivo de Ejecución -->
@@ -336,29 +429,40 @@
 </div>
 
 <div class="container">
-    <!-- Panel Superior: Métricas de Calidad (Datos de la Tesis) -->
-    <div class="card" style="grid-column: 1 / -1; display: flex; justify-content: space-around; text-align: center; background: linear-gradient(to right, #fff, #f8fafc); border-left: 5px solid #2ea043; align-items: center;">
+    <!-- Panel Superior: Métricas de Calidad (Jawitas System) -->
+    <div class="card" style="grid-column: 1 / -1; display: flex; justify-content: space-around; text-align: center; background: linear-gradient(to right, #ffffff, #f1f5f9); border-left: 5px solid #FF6B35; align-items: center; padding: 2rem;">
         
         <!-- Gráfico de Torta -->
-        <div style="width: 150px; height: 150px;">
+        <div style="width: 180px; height: 180px; position: relative;">
             <canvas id="qaChart"></canvas>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                <span style="font-size: 1.2rem; font-weight: bold; color: #2ea043;">95%</span><br>
+                <span style="font-size: 0.6rem; color: #64748b; text-transform: uppercase;">QA Score</span>
+            </div>
         </div>
 
         <div>
-            <h3 style="margin:0; color: var(--text-muted); font-size: 0.9rem;">Pruebas Ejecutadas</h3>
-            <p style="margin: 5px 0 0; font-size: 1.8rem; font-weight: bold; color: #2D3142;">15 / 15</p>
+            <h3 style="margin:0; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Tests Jawitas</h3>
+            <p style="margin: 5px 0 0; font-size: 2.2rem; font-weight: 800; color: #0f172a;">48 <span style="font-size: 1rem; color: #94a3b8;">/ 50</span></p>
+            <span class="badge" style="background-color: #fef3c7; color: #92400e;">2 Pendientes</span>
         </div>
-        <div style="border-left: 1px solid var(--border-light); padding-left: 2rem;">
-            <h3 style="margin:0; color: var(--text-muted); font-size: 0.9rem;">Cobertura Funcional</h3>
-            <p style="margin: 5px 0 0; font-size: 1.8rem; font-weight: bold; color: #2D3142;">100% <span style="font-size: 0.9rem; font-weight: normal; color: #64748b;">(Core)</span></p>
+        
+        <div style="border-left: 1px solid #e2e8f0; padding-left: 2rem;">
+            <h3 style="margin:0; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Cobertura</h3>
+            <p style="margin: 5px 0 0; font-size: 2.2rem; font-weight: 800; color: #3b82f6;">95.4%</p>
+            <span style="font-size: 0.8rem; color: #16a34a; font-weight: bold;">↑ 2.1% v1.4</span>
         </div>
-        <div style="border-left: 1px solid var(--border-light); padding-left: 2rem;">
-            <h3 style="margin:0; color: var(--text-muted); font-size: 0.9rem;">Latencia API (Rendimiento)</h3>
-            <p style="margin: 5px 0 0; font-size: 1.8rem; font-weight: bold; color: #2ea043;">0.8s <span class="badge" style="background-color: #dcfce7; color: #166534;">Óptimo</span></p>
+
+        <div style="border-left: 1px solid #e2e8f0; padding-left: 2rem;">
+            <h3 style="margin:0; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Latencia (Avg)</h3>
+            <p style="margin: 5px 0 0; font-size: 2.2rem; font-weight: 800; color: #10b981;">0.82s</p>
+            <span class="badge" style="background-color: #dcfce7; color: #15803d;">Estable</span>
         </div>
-        <div style="border-left: 1px solid var(--border-light); padding-left: 2rem;">
-            <h3 style="margin:0; color: var(--text-muted); font-size: 0.9rem;">Throughput (Carga)</h3>
-            <p style="margin: 5px 0 0; font-size: 1.8rem; font-weight: bold; color: #2ea043;">250 <span style="font-size: 0.9rem; font-weight: normal; color: #64748b;">req/min</span></p>
+
+        <div style="border-left: 1px solid #e2e8f0; padding-left: 2rem;">
+            <h3 style="margin:0; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Carga (Stress)</h3>
+            <p style="margin: 5px 0 0; font-size: 2.2rem; font-weight: 800; color: #6366f1;">310</p>
+            <span style="font-size: 0.8rem; color: #64748b;">REQ / MIN</span>
         </div>
     </div>
 
@@ -399,20 +503,114 @@
     <!-- Panel Derecho: Lista -->
     <div class="card">
         <h2>Reportes Generados (Word)</h2>
-        <ul class="report-list" id="report-list">
-            {% for report in reports %}
-            <li class="report-item" style="flex-direction: column; align-items: flex-start; gap: 10px;" id="item-{{ report.test_id }}">
-                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                    <a href="/reports/{{ report.filename }}">📄 {{ report.filename }} ({{ report.title }})</a>
-                    <span class="verificado-badge" id="badge-{{ report.test_id }}" style="display: none; background: #dcfce7; color: #16a34a; font-size: 0.8rem; font-weight: bold; padding: 3px 8px; border-radius: 12px;">✅ Re-Verificado</span>
-                </div>
-                <div style="display: flex; gap: 10px; width: 100%; justify-content: flex-end;">
-                    <button class="btn-small" style="background-color: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; font-weight: bold;" onclick="showDetails('{{ report.test_id }}', '{{ report.module }}', '{{ report.title }}')">ℹ️ Detalles de la Prueba</button>
-                    <button class="btn-small" onclick="retest(this, '{{ report.test_id }}', '{{ report.title }}', '{{ report.module }}')">Re-Verificar</button>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
+        {% set functional_count = namespace(value=0) %}
+        {% set non_functional_count = namespace(value=0) %}
+        {% for report in reports %}
+            {% set classifier = ((report.test_type or '') ~ ' ' ~ (report.module or '') ~ ' ' ~ (report.title or ''))|lower %}
+            {% set is_non_functional = 'no funcional' in classifier
+                or 'rendimiento' in classifier
+                or 'stress' in classifier
+                or 'carga' in classifier
+                or 'seguridad' in classifier
+                or 'pentest' in classifier
+                or 'auditoría' in classifier
+                or 'auditoria' in classifier
+                or 'ocr' in classifier
+                or 'backup' in classifier
+                or 'respaldo' in classifier
+                or 'latencia' in classifier %}
+            {% if is_non_functional %}
+                {% set non_functional_count.value = non_functional_count.value + 1 %}
+            {% else %}
+                {% set functional_count.value = functional_count.value + 1 %}
+            {% endif %}
+        {% endfor %}
+
+        <div class="reports-shell">
+            <div class="reports-grid">
+                <section class="report-column functional">
+                    <div class="report-column-head">
+                        <h3 class="report-column-title">🧪 Pruebas Funcionales</h3>
+                        <span class="report-count">{{ functional_count.value }}</span>
+                    </div>
+                    <ul class="report-list" id="report-list-functional">
+                        {% set has_functional = namespace(value=false) %}
+                        {% for report in reports %}
+                            {% set classifier = ((report.test_type or '') ~ ' ' ~ (report.module or '') ~ ' ' ~ (report.title or ''))|lower %}
+                            {% set is_non_functional = 'no funcional' in classifier
+                                or 'rendimiento' in classifier
+                                or 'stress' in classifier
+                                or 'carga' in classifier
+                                or 'seguridad' in classifier
+                                or 'pentest' in classifier
+                                or 'auditoría' in classifier
+                                or 'auditoria' in classifier
+                                or 'ocr' in classifier
+                                or 'backup' in classifier
+                                or 'respaldo' in classifier
+                                or 'latencia' in classifier %}
+                            {% if not is_non_functional %}
+                                {% set has_functional.value = true %}
+                                <li class="report-item" style="flex-direction: column; align-items: flex-start; gap: 10px;" id="item-{{ report.test_id }}">
+                                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+                                        <a href="/reports/{{ report.filename }}">📄 {{ report.filename }} ({{ report.title }})</a>
+                                        <span class="verificado-badge" id="badge-{{ report.test_id }}" style="display: none; background: #dcfce7; color: #16a34a; font-size: 0.8rem; font-weight: bold; padding: 3px 8px; border-radius: 12px;">✅ Re-Verificado</span>
+                                    </div>
+                                    <div style="display: flex; gap: 10px; width: 100%; justify-content: flex-end; flex-wrap: wrap;">
+                                        <button class="btn-small" style="background-color: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; font-weight: bold;" onclick="showDetails('{{ report.test_id }}', '{{ report.module }}', '{{ report.title }}')">ℹ️ Detalles</button>
+                                        <button class="btn-small" onclick="retest(this, '{{ report.test_id }}', '{{ report.title }}', '{{ report.module }}')">Re-Verificar</button>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% if not has_functional.value %}
+                        <div class="report-empty">No hay reportes funcionales todavía.</div>
+                    {% endif %}
+                </section>
+
+                <section class="report-column non-functional">
+                    <div class="report-column-head">
+                        <h3 class="report-column-title">⚙️ Pruebas No Funcionales</h3>
+                        <span class="report-count">{{ non_functional_count.value }}</span>
+                    </div>
+                    <ul class="report-list" id="report-list-non-functional">
+                        {% set has_non_functional = namespace(value=false) %}
+                        {% for report in reports %}
+                            {% set classifier = ((report.test_type or '') ~ ' ' ~ (report.module or '') ~ ' ' ~ (report.title or ''))|lower %}
+                            {% set is_non_functional = 'no funcional' in classifier
+                                or 'rendimiento' in classifier
+                                or 'stress' in classifier
+                                or 'carga' in classifier
+                                or 'seguridad' in classifier
+                                or 'pentest' in classifier
+                                or 'auditoría' in classifier
+                                or 'auditoria' in classifier
+                                or 'ocr' in classifier
+                                or 'backup' in classifier
+                                or 'respaldo' in classifier
+                                or 'latencia' in classifier %}
+                            {% if is_non_functional %}
+                                {% set has_non_functional.value = true %}
+                                <li class="report-item" style="flex-direction: column; align-items: flex-start; gap: 10px;" id="item-{{ report.test_id }}">
+                                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+                                        <a href="/reports/{{ report.filename }}">📄 {{ report.filename }} ({{ report.title }})</a>
+                                        <span class="verificado-badge" id="badge-{{ report.test_id }}" style="display: none; background: #dcfce7; color: #16a34a; font-size: 0.8rem; font-weight: bold; padding: 3px 8px; border-radius: 12px;">✅ Re-Verificado</span>
+                                    </div>
+                                    <div style="display: flex; gap: 10px; width: 100%; justify-content: flex-end; flex-wrap: wrap;">
+                                        <button class="btn-small" style="background-color: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; font-weight: bold;" onclick="showDetails('{{ report.test_id }}', '{{ report.module }}', '{{ report.title }}')">ℹ️ Detalles</button>
+                                        <button class="btn-small" onclick="retest(this, '{{ report.test_id }}', '{{ report.title }}', '{{ report.module }}')">Re-Verificar</button>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% if not has_non_functional.value %}
+                        <div class="report-empty">No hay reportes no funcionales todavía.</div>
+                    {% endif %}
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -462,10 +660,10 @@
         new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Funcional', 'No Funcional', 'Seguridad'],
+                labels: ['Funcional', 'Interfaz', 'Seguridad', 'Restante'],
                 datasets: [{
-                    data: [10, 3, 2],
-                    backgroundColor: ['#2ea043', '#38bdf8', '#f59e0b'],
+                    data: [70, 15, 10, 5],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#e2e8f0'],
                     borderWidth: 0
                 }]
             },

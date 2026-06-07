@@ -1,0 +1,151 @@
+------------------------------------------------------------
+ARQUITECTURA DEL MENÚ (SIDEBAR) - GUÍA PARA AGENTE QA E2E
+------------------------------------------------------------
+[CARACTERÍSTICAS CLAVE PARA EL AGENTE DE PRUEBAS AUTOMATIZADAS]
+1. COMPORTAMIENTO COMPACTO (COLLAPSIBLE): El menú lateral (AppLayout/Sidebar) inicia en ESTADO COLAPSADO para maximizar el área de trabajo. El agente QA DEBE simular un evento "hover" (mouseover) sobre el contenedor del menú, o buscar y hacer "click" en el botón de expansión (hamburger button) para hacer visibles los textos de las rutas en el DOM.
+2. RUTAS Y DOM: El agente debe interactuar buscando elementos de anclaje (<a> o <router-link>) cuyo atributo 'href' coincida exactamente con las rutas indicadas (ej: href="/app/usuarios").
+3. BOTONES GLOBALES DE VISTA: Ubicados generalmente en el `<header>` superior de las vistas. Buscar por selectores `.primary-btn` (ej. "Nuevo registro") y `.ghost-btn` (ej. "Exportar Excel", "Exportar PDF", "Historial Eliminación").
+4. ACCIONES EN TABLAS (CRUD): Las acciones individuales por registro están en la última columna de la tabla (`<td>`) encapsuladas en un div `.actions-row`. El agente debe hacer click en botones con la clase `.icon-btn` (ej. `.icon-btn.danger` para eliminar, `.icon-btn.success` para restaurar).
+5. INTERACCIÓN ASÍNCRONA: El agente DEBE esperar a que desaparezcan los indicadores de carga (elementos con clase `.state-box` y texto "Cargando...") antes de interactuar.
+
+[ESTRUCTURA DE ÁRBOL VISUAL Y RUTAS]
+
+📁 INICIO / DASHBOARDS
+  ├─ Inicio Admin
+  │  ├─ Ruta: /app/dashboard
+  │  └─ Acciones QA: visualizar métricas, consultar Agente IA, ver resumen global.
+  ├─ Inicio Empleado
+  │  ├─ Ruta: /app/dashboard-personal
+  │  └─ Acciones QA: visualizar progreso propio, ver accesos rápidos (Empleado).
+  └─ Mi Perfil
+     ├─ Ruta: /app/perfil
+     └─ Acciones QA: actualizar foto, editar teléfono, abrir modal de cambio de contraseña.
+
+ MI ÁREA (EMPLEADOS)
+  ├─ Mi Inventario
+  │  ├─ Ruta: /app/mi-inventario
+  │  └─ Acciones QA: buscar producto en input de búsqueda, realizar ajustes de stock.
+  ├─ Mis Tareas
+  │  ├─ Ruta: /app/mis-tareas
+  │  └─ Acciones QA: actualizar progreso (%), cambiar select de estado.
+  ├─ Punto de Caja
+  │  ├─ Ruta: /app/punto-caja
+  │  └─ Acciones QA: buscar producto, registrar cliente en sistema, cobrar venta, imprimir factura.
+  └─ OCR Inventario
+     ├─ Ruta: /app/ocr-inventario
+     └─ Acciones QA: interactuar con input file para subir imagen/documento, iniciar extracción OCR.
+
+ CATÁLOGO
+  ├─ Categorías
+  │  ├─ Ruta: /app/categorias
+  │  └─ Acciones QA: crear, editar, eliminar (baja lógica), buscar, filtrar, exportar PDF, exportar Excel, historial eliminación, restaurar, eliminar físico.
+  ├─ Sucursales
+  │  ├─ Ruta: /app/sucursales
+  │  └─ Acciones QA: crear, editar, eliminar (baja lógica), buscar, filtrar, exportar PDF, exportar Excel, historial eliminación, restaurar, eliminar físico.
+  ├─ Clientes
+  │  ├─ Ruta: /app/clientes
+  │  └─ Acciones QA: crear, editar, eliminar (baja lógica), buscar, filtrar, exportar PDF, exportar Excel, historial eliminación, restaurar, eliminar físico.
+  └─ Productos
+     ├─ Ruta: /app/productos
+     └─ Acciones QA: crear, editar, eliminar (baja lógica), buscar, filtrar, exportar PDF, exportar Excel, historial eliminación, restaurar, eliminar físico.
+
+ INVENTARIO
+  ├─ Inventario Global
+  │  ├─ Ruta: /app/inventario
+  │  └─ Acciones QA: visualizar panel, seleccionar tarjeta de sucursal para navegar a detalle.
+  └─ Inventario Sucursal (Dinámico)
+     ├─ Ruta: /app/inventario/sucursal/:branchId
+     └─ Acciones QA: visualizar tabla de stock, buscar en input, actualizar input numérico de stock crítico.
+
+ OPERACIONES
+  ├─ Ventas
+  │  ├─ Ruta: /app/ventas
+  │  └─ Acciones QA: crear, editar, eliminar (baja lógica), buscar, filtrar, exportar PDF/Excel, historial eliminación, restaurar.
+  ├─ Detalles Ventas
+  │  ├─ Ruta: /app/detalles-ventas
+  │  └─ Acciones QA: crear, editar, eliminar (baja lógica), buscar, filtrar, exportar PDF/Excel, historial eliminación, restaurar.
+  ├─ Productos Sucursales
+  │  ├─ Ruta: /app/productos-sucursales
+  │  └─ Acciones QA: asignar producto (crear), editar, eliminar (baja lógica), buscar, filtrar, exportar PDF/Excel, historial eliminación.
+  ├─ Historial Stock
+  │  ├─ Ruta: /app/historial-stock
+  │  └─ Acciones QA: buscar en listado, filtrar, exportar PDF/Excel, historial eliminación.
+  ├─ Historial Precios Productos
+  │  ├─ Ruta: /app/historial-precios-productos
+  │  └─ Acciones QA: visualizar listado, buscar, filtrar, exportar PDF/Excel.
+  └─ Historial Rendimiento Sucursales
+     ├─ Ruta: /app/historial-rendimiento-sucursales
+     └─ Acciones QA: visualizar listado, buscar, filtrar, exportar PDF/Excel.
+
+ FINANZAS
+  ├─ Transacciones Financieras
+  │  ├─ Ruta: /app/transacciones-financieras
+  │  └─ Acciones QA: crear, editar, eliminar (baja lógica), buscar, filtrar, exportar PDF/Excel, historial eliminación.
+  ├─ Balances Mensuales
+  │  ├─ Ruta: /app/balances-mensuales
+  │  └─ Acciones QA: crear, editar, eliminar (baja lógica), buscar, filtrar, exportar PDF/Excel, historial eliminación.
+  ├─ Historial Facturas
+  │  ├─ Ruta: /app/historial-facturas-clientes
+  │  └─ Acciones QA: buscar, filtrar listado, exportar PDF/Excel.
+  └─ Códigos Verificación Contraseña
+     ├─ Ruta: /app/codigos-verificacion-contrasena
+     └─ Acciones QA: buscar, filtrar, exportar PDF/Excel.
+
+📁 GESTIÓN DE TAREAS
+  ├─ Asignación de Tareas (Gerencia)
+  │  ├─ Ruta: /app/asignacion-tareas
+  │  └─ Acciones QA: llenar form (.form), seleccionar empleado, crear asignación, definir progreso.
+  ├─ Tareas
+  │  ├─ Ruta: /app/tareas
+  │  └─ Acciones QA: crear, editar, buscar, filtrar, eliminar (baja lógica), exportar PDF/Excel, historial eliminación.
+  ├─ Asignaciones Tareas
+  │  ├─ Ruta: /app/asignaciones-tareas
+  │  └─ Acciones QA: editar, buscar, filtrar, exportar PDF/Excel, historial eliminación.
+  ├─ Estados Tareas
+  │  ├─ Ruta: /app/estados-tareas
+  │  └─ Acciones QA: crear, editar, buscar, filtrar, eliminar, exportar PDF/Excel.
+  ├─ Prioridades Tareas
+  │  ├─ Ruta: /app/prioridades-tareas
+  │  └─ Acciones QA: crear, editar, buscar, filtrar, eliminar, exportar PDF/Excel.
+  └─ Cambios Estado Tareas
+     ├─ Ruta: /app/cambios-estado-tareas
+     └─ Acciones QA: buscar, filtrar, exportar PDF/Excel.
+
+ ADMINISTRACIÓN (USUARIOS Y ROLES)
+  ├─ Usuarios
+  │  ├─ Ruta: /app/usuarios
+  │  └─ Acciones QA: interactuar con modal (.modal-card), crear, editar, resetear contraseña (.password-reset-trigger-wrap), baja lógica, historial eliminación, restaurar, eliminar físico.
+  ├─ Roles
+  │  ├─ Ruta: /app/roles
+  │  └─ Acciones QA: crear, editar, buscar, filtrar, eliminar (baja lógica), exportar PDF/Excel, historial eliminación.
+  └─ Whitelist Google
+     ├─ Ruta: /app/whitelist-google
+     └─ Acciones QA: añadir email (crear), editar, buscar, eliminar, exportar PDF/Excel.
+
+📁 OPERACIONES OCR
+  ├─ Escaneo OCR Documentos
+  │  ├─ Ruta: /app/ocr/escaneo-documentos
+  │  └─ Acciones QA: subir archivo, procesar imagen, validar json extraído.
+  ├─ Documentaciones OCR
+  │  ├─ Ruta: /app/ocr/documentaciones
+  │  └─ Acciones QA: visualizar listado, editar, buscar, filtrar, exportar PDF/Excel.
+  └─ Documentación Sucursales
+     ├─ Ruta: /app/ocr/documentacion-sucursales
+     └─ Acciones QA: visualizar, buscar, filtrar, exportar PDF/Excel.
+
+📁 AUDITORÍA Y SEGURIDAD
+  ├─ Registro de Actividad
+  │  ├─ Ruta: /app/auditoria/registro-actividad
+  │  └─ Acciones QA: visualizar logs en tabla, buscar por IP/usuario, filtrar, exportar PDF/Excel.
+  ├─ Control Accesos y Roles
+  │  ├─ Ruta: /app/auditoria/control-accesos-roles
+  │  └─ Acciones QA: seleccionar rol, filtrar módulo (.toolbar select), buscar permiso, interactuar con input checkbox tipo toggle (.switch) en la matriz de accesos.
+  ├─ Logs del Sistema
+  │  ├─ Ruta: /app/auditoria/logs-sistema
+  │  └─ Acciones QA: visualizar trazabilidad de errores.
+  ├─ Monitoreo del Sistema
+  │  ├─ Ruta: /app/auditoria/monitoreo-sistema
+  │  └─ Acciones QA: visualizar métricas en tiempo real (RAM, CPU).
+  └─ Respaldos (Backups)
+     ├─ Ruta: /app/auditoria/backups
+     └─ Acciones QA: ver historial, presionar botón solicitar backup manual, descargar (.sql).

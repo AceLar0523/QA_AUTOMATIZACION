@@ -39,17 +39,24 @@ def index():
         if f.endswith('.docx'):
             # Extraer TC-001 de Reporte_TC-001.docx
             test_id = f.replace('Reporte_', '').replace('.docx', '')
-            details = db_data.get(test_id, {"title": "Desconocido", "module": "Desconocido"})
-            reports.append({"filename": f, "test_id": test_id, "title": details["title"], "module": details["module"]})
+            details = db_data.get(test_id, {"title": "Desconocido", "module": "Desconocido", "test_type": "Desconocido"})
+            reports.append({
+                "filename": f,
+                "test_id": test_id,
+                "title": details.get("title", "Desconocido"),
+                "module": details.get("module", "Desconocido"),
+                "test_type": details.get("test_type", "Desconocido")
+            })
             
     return render_template('index.html', scenarios=TEST_SCENARIOS, reports=reports)
 
 @app.route('/generate', methods=['POST'])
 def generate_test():
     data = request.json
-    test_id = data.get('id', f"TC-NEW-{len(os.listdir(REPORT_DIR))+1}")
+    test_id = data.get('id') or f"TC-NEW-{len(os.listdir(REPORT_DIR))+1}"
     title = data.get('title')
     module = data.get('module')
+    test_type = data.get('tipo_prueba', 'Funcional (E2E)')
     
     if not title or not module:
         return jsonify({"success": False, "error": "Faltan datos"}), 400
@@ -60,7 +67,7 @@ def generate_test():
         with open('db.json', 'r', encoding='utf-8') as f:
             db_data = json.load(f)
             
-    db_data[test_id] = {"title": title, "module": module}
+    db_data[test_id] = {"title": title, "module": module, "test_type": test_type}
     with open('db.json', 'w', encoding='utf-8') as f:
         json.dump(db_data, f, ensure_ascii=False, indent=2)
         
